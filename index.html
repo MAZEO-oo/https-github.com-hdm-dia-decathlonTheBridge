@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Decathlon Running — Max, Votre Assistant Running Intelligent</title>
+  <meta name="description" content="Projet étudiant Decathlon The Bridge : site e-commerce running interactif avec Max, assistant conversationnel propulsé par LLM.">
+  <link rel="icon" type="image/png" href="assets/decathlon-logo.png">
+
+  <!-- Polices Google Fonts : Inter & Roboto Condensed -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Feuilles de styles -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/chatbot.css">
+</head>
+<body>
+
+  <!-- BANDEAU SUPÉRIEUR D'INFORMATIONS -->
+  <div class="top-bar">
+    <span>Livraison offerte dès 49€</span>
+    <span class="bullet">•</span>
+    <span>Retours gratuits sous 365 jours</span>
+    <span class="bullet">•</span>
+    <span>Conseils de nos experts running</span>
+    <span class="bullet">•</span>
+    <span class="top-link" onclick="window.maxBot.openWithQuery('Bien choisir mes chaussures')">✦ Tester le diagnostic Max</span>
+  </div>
+
+  <!-- HEADER PRINCIPAL DU SITE -->
+  <header class="site-header">
+    <div class="header-inner">
+      <!-- Logo Decathlon Running -->
+      <div class="logo-container" onclick="window.app.showView('home')">
+        <img src="assets/decathlon-logo.png" alt="Decathlon Logo" class="logo-icon" onerror="this.style.display='none'">
+        <div class="logo-text">
+          DECATHLON <span class="logo-badge">RUNNING</span>
+        </div>
+      </div>
+
+      <!-- Navigation principale -->
+      <nav class="nav-links">
+        <button class="nav-btn active" data-view="home" onclick="window.app.showView('home')">Accueil</button>
+        <button class="nav-btn" data-view="catalogue" onclick="window.app.showCategory('Chaussures')">Chaussures</button>
+        <button class="nav-btn" data-view="catalogue" onclick="window.app.showCategory('Vêtements')">Vêtements</button>
+        <button class="nav-btn" data-view="catalogue" onclick="window.app.showCategory('Accessoires')">Accessoires</button>
+        <button class="nav-btn" data-view="conseils" onclick="window.app.showView('conseils')">Nos conseils</button>
+      </nav>
+
+      <!-- Barre de recherche produit -->
+      <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        <input id="headerSearchInput" placeholder="Rechercher KD900X, amorti, trail, veste..." aria-label="Rechercher un produit">
+      </div>
+
+      <!-- Actions de droite -->
+      <div class="header-actions">
+        <!-- Bouton spécial "Être conseillé" (Max Chatbot) -->
+        <button class="btn-conseille" onclick="window.maxBot.toggleChat(true)" title="Ouvrir le conseiller Max">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14v12H10l-5 4z"></path><path d="M9 8h6M9 12h4"></path></svg>
+          Être conseillé
+          <span class="pulse-dot"></span>
+        </button>
+
+        <button class="action-btn" onclick="window.app.showView('about')" title="À propos du projet">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>
+          Projet
+        </button>
+
+        <button class="action-btn" onclick="window.app.showView('cart')" title="Voir mon panier">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
+          Panier <span id="cartBadge" class="cart-badge" style="display:none;">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENEUR DYNAMIQUE DES PAGES / VUES -->
+  <main id="mainApp"></main>
+
+  <!-- =========================================================================
+       CHATBOT MAX : TIROIR CONVERSATIONNEL ET ASSISTANT IA
+       ========================================================================= -->
+
+  <!-- Bouton déclencheur flottant (Bottom-Right) -->
+  <button class="max-floating-launcher" onclick="window.maxBot.toggleChat(true)" aria-label="Ouvrir le chat avec Max">
+    <div class="max-launcher-icon">✦</div>
+    <span>Besoin d'un conseil ? Max est là</span>
+    <span class="max-launcher-dot"></span>
+  </button>
+
+  <!-- Tiroir principal du Chatbot Max -->
+  <aside class="max-chat-drawer" id="maxChatDrawer" aria-label="Chat avec Max">
+    <!-- Header de Max -->
+    <div class="max-header">
+      <div class="max-header-info">
+        <div class="max-avatar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 1 0-16 0"></path></svg>
+          <span class="max-status-dot"></span>
+        </div>
+        <div class="max-header-names">
+          <h4>Max <span class="max-model-tag">IA RUNNING</span></h4>
+          <p id="maxStatusBadge">En ligne · Mode Expert Decathlon</p>
+        </div>
+      </div>
+
+      <div class="max-header-actions">
+        <!-- Bouton configuration de la clé API / LLM -->
+        <button class="max-btn-icon" onclick="openConfigModal()" title="Paramètres IA & Clé API">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+        <!-- Fermer le chat -->
+        <button class="max-btn-icon" onclick="window.maxBot.toggleChat(false)" title="Fermer l'assistant">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Barre de progression pour scénarios guidés -->
+    <div class="max-progress-strip" id="maxProgressStrip">
+      <span id="maxProgressLabel">Question 1 sur 5</span>
+      <div class="max-progress-bar-bg">
+        <div class="max-progress-bar-fill" id="maxProgressBarFill"></div>
+      </div>
+    </div>
+
+    <!-- Zone de défilement des messages -->
+    <div class="max-messages-area" id="maxMessagesArea"></div>
+
+    <!-- Zone des réponses rapides / suggestions -->
+    <div class="max-chips-area" id="maxChipsArea"></div>
+
+    <!-- Zone de saisie inférieure -->
+    <div class="max-input-area">
+      <input type="text" class="max-text-input" id="maxInputText" placeholder="Posez une question à Max (ex: plaque carbone, débuter...)" aria-label="Votre message pour Max">
+      <button class="max-btn-send" id="maxBtnSend" aria-label="Envoyer le message">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- =========================================================================
+       MODAL DE CONFIGURATION LLM & CLÉ API
+       Permet d'ajouter une clé API Google Gemini ou OpenAI en 5 secondes
+       ========================================================================= -->
+  <div class="config-modal-backdrop" id="maxConfigModal">
+    <div class="config-modal-card">
+      <div class="config-modal-header">
+        <h3>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"></path><path d="M16 14a6 6 0 0 1 6 6v2H2v-2a6 6 0 0 1 6-6h8z"></path></svg>
+          Configuration de l'IA Max (LLM)
+        </h3>
+        <button class="max-btn-icon" onclick="closeConfigModal()">✕</button>
+      </div>
+
+      <div class="config-modal-body">
+        <div id="modalStatusBadge" class="config-status-badge fallback">
+          <span>●</span> Mode Hors-Ligne Expert Actif (Aucune clé requise pour tester)
+        </div>
+
+        <div class="config-field">
+          <label for="cfgProvider">Fournisseur d'IA (LLM)</label>
+          <select id="cfgProvider" onchange="onProviderChange(this.value)">
+            <option value="gemini">Google Gemini API (Recommandé / Rapide)</option>
+            <option value="openai">OpenAI (GPT-4o / GPT-4o-mini)</option>
+            <option value="cloudflare">Cloudflare Serverless (/api/chat)</option>
+            <option value="demo">Mode Démo Autonome (Sans clé)</option>
+          </select>
+          <div class="helper-text">
+            Sélectionnez votre moteur d'IA. Gemini 1.5 Flash offre d'excellentes performances pour le jury.
+          </div>
+        </div>
+
+        <div class="config-field" id="cfgApiKeyGroup">
+          <label for="cfgApiKey">Clé API (API Key)</label>
+          <input type="password" id="cfgApiKey" placeholder="Collez votre clé API ici (ex: AIzaSy... ou sk-...)">
+          <div class="helper-text">
+            La clé est stockée uniquement dans votre navigateur (localStorage). Elle ne sera jamais divulguée.
+          </div>
+        </div>
+
+        <div class="config-field" id="cfgModelGroup">
+          <label for="cfgModel">Modèle sélectionné</label>
+          <input type="text" id="cfgModel" value="gemini-1.5-flash">
+          <div class="helper-text">
+            Exemples : <code>gemini-1.5-flash</code>, <code>gemini-2.0-flash</code>, ou <code>gpt-4o-mini</code>.
+          </div>
+        </div>
+
+        <div class="config-modal-actions">
+          <button class="btn-outline" onclick="closeConfigModal()">Annuler</button>
+          <button class="btn-primary" onclick="saveConfigModal()">Enregistrer la configuration</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIED DE PAGE DECATHLON -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="logo-text" style="color:#fff;margin-bottom:12px;">
+            DECATHLON <span class="logo-badge">RUNNING</span>
+          </div>
+          <p style="color:#B4B9D2;font-size:13.5px;line-height:1.6;margin-bottom:16px;">
+            Projet étudiant The Bridge pour réinventer l'expérience conseil running de Decathlon avec l'intelligence artificielle conversationnelle.
+          </p>
+          <span style="display:inline-block;background:rgba(123,241,196,0.15);color:var(--mint-green);padding:4px 10px;border-radius:4px;font-size:11.5px;font-weight:700;">
+            PRÉSENTATION JURY THE BRIDGE
+          </span>
+        </div>
+
+        <div class="footer-col">
+          <h5>Rayon Running</h5>
+          <ul>
+            <li><button onclick="window.app.filterByTerrain('route')">Chaussures Route & Bitume</button></li>
+            <li><button onclick="window.app.filterByTerrain('trail')">Chaussures Trail & Sentiers</button></li>
+            <li><button onclick="window.app.showCategory('Vêtements')">Textiles & Coupe-vent</button></li>
+            <li><button onclick="window.app.showCategory('Accessoires')">Montres GPS & Lampes</button></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Engagements & SAV</h5>
+          <ul>
+            <li><button onclick="window.app.showView('shipping')">Livraison offerte dès 49€</button></li>
+            <li><button onclick="window.app.showView('shipping')">Test & Retour sous 365 jours</button></li>
+            <li><button onclick="window.app.showView('shipping')">Click & Collect 1h en magasin</button></li>
+            <li><button onclick="window.maxBot.talkToHuman()">Parler à un conseiller</button></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Innovation & IA</h5>
+          <ul>
+            <li><button onclick="window.maxBot.toggleChat(true)">Max Assistant Running</button></li>
+            <li><button onclick="openConfigModal()">Configuration de l'IA (LLM)</button></li>
+            <li><button onclick="window.app.showView('conseils')">Laboratoire SportsLab</button></li>
+            <li><button onclick="window.app.showView('about')">The Bridge 2026</button></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>© Decathlon Running · Projet The Bridge · Déploiement GitHub & Cloudflare Pages</div>
+        <div style="display:flex;gap:18px;">
+          <a href="#" onclick="window.app.showView('about')">Mentions légales</a>
+          <a href="#" onclick="openConfigModal()">Paramètres LLM</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- CHARGEMENT DES SCRIPTS JS -->
+  <script src="js/products.js"></script>
+  <script src="js/max-chatbot.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    // Initialisation globale au chargement du DOM
+    document.addEventListener('DOMContentLoaded', () => {
+      window.app = new DecathlonApp();
+      window.maxBot = new MaxChatbot();
+    });
+
+    // Gestion du modal de configuration de l'IA
+    function openConfigModal() {
+      const modal = document.getElementById('maxConfigModal');
+      const cfg = window.maxBot ? window.maxBot.config : {};
+      
+      document.getElementById('cfgProvider').value = cfg.provider || 'gemini';
+      document.getElementById('cfgApiKey').value = cfg.apiKey || '';
+      document.getElementById('cfgModel').value = cfg.model || (cfg.provider === 'openai' ? 'gpt-4o-mini' : 'gemini-1.5-flash');
+
+      onProviderChange(cfg.provider || 'gemini');
+
+      const badge = document.getElementById('modalStatusBadge');
+      if (cfg.apiKey && cfg.apiKey.trim().length > 5) {
+        badge.className = 'config-status-badge active';
+        badge.innerHTML = `<span>●</span> Clé API configurée (${cfg.provider.toUpperCase()} : ${cfg.model})`;
+      } else {
+        badge.className = 'config-status-badge fallback';
+        badge.innerHTML = `<span>●</span> Mode Hors-Ligne Expert Actif (Aucune clé requise pour tester)`;
+      }
+
+      modal.classList.add('open');
+    }
+
+    function closeConfigModal() {
+      document.getElementById('maxConfigModal').classList.remove('open');
+    }
+
+    function onProviderChange(val) {
+      const keyGroup = document.getElementById('cfgApiKeyGroup');
+      const modelGroup = document.getElementById('cfgModelGroup');
+      const modelInput = document.getElementById('cfgModel');
+
+      if (val === 'demo') {
+        keyGroup.style.display = 'none';
+        modelGroup.style.display = 'none';
+      } else if (val === 'cloudflare') {
+        keyGroup.style.display = 'none';
+        modelGroup.style.display = 'none';
+      } else {
+        keyGroup.style.display = 'block';
+        modelGroup.style.display = 'block';
+        if (val === 'gemini' && modelInput.value.includes('gpt')) {
+          modelInput.value = 'gemini-1.5-flash';
+        } else if (val === 'openai' && modelInput.value.includes('gemini')) {
+          modelInput.value = 'gpt-4o-mini';
+        }
+      }
+    }
+
+    function saveConfigModal() {
+      const provider = document.getElementById('cfgProvider').value;
+      const apiKey = document.getElementById('cfgApiKey').value.trim();
+      const model = document.getElementById('cfgModel').value.trim();
+
+      if (window.maxBot) {
+        window.maxBot.saveConfig({
+          provider: provider,
+          apiKey: apiKey,
+          model: model
+        });
+      }
+
+      closeConfigModal();
+      window.app.showToast('Configuration IA mise à jour avec succès !');
+    }
+  </script>
+</body>
+</html>
