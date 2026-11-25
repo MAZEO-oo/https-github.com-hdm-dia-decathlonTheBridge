@@ -366,7 +366,7 @@ class DecathlonApp {
       <article class="product-card">
         <span class="product-badge-tag">${p.tag}</span>
         <div class="product-img-box" onclick="window.app.showView('product-detail', ${p.id})">
-          <img src="${p.img}" alt="${p.name}" loading="lazy">
+          <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.src='${p.imgFallback}'">
         </div>
         <div class="product-body">
           <div class="product-brand">${p.brand} · ${p.usage}</div>
@@ -608,8 +608,14 @@ class DecathlonApp {
       </div>
 
       <div class="wrap detail-grid">
-        <div class="detail-gallery">
-          <img src="${p.img}" alt="${p.name}">
+        <div class="detail-media">
+          <div class="detail-gallery">
+            <img id="detailMainImg" src="${p.img}" alt="${p.name}" onerror="this.onerror=null;this.src='${p.imgFallback}'">
+          </div>
+          <div class="detail-thumbs">
+            <img src="${p.img}" alt="${p.name} - vue 1" class="active" onerror="this.onerror=null;this.src='${p.imgFallback}'" onclick="window.app.setDetailImage(this)">
+            ${p.gallery.map((g, i) => `<img src="${g}" alt="${p.name} - vue ${i + 2}" onerror="this.remove()" onclick="window.app.setDetailImage(this)">`).join('')}
+          </div>
         </div>
 
         <div class="detail-info">
@@ -805,6 +811,13 @@ class DecathlonApp {
   // =========================================================================
   // PAGES CONSEILS / SAV / À PROPOS
   // =========================================================================
+
+  setDetailImage(thumb) {
+    const main = document.getElementById('detailMainImg');
+    if (main) main.src = thumb.src;
+    document.querySelectorAll('.detail-thumbs img').forEach(i => i.classList.remove('active'));
+    thumb.classList.add('active');
+  }
 
   getConseilsHTML() {
     return `

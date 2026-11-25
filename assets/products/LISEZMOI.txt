@@ -1,0 +1,4 @@
+Photos produits : product-<id>.jpg (photo principale)
+Photos supplémentaires (optionnelles, fiche produit) : product-<id>-2.jpg et product-<id>-3.jpg
+Absentes -> la miniature est masquée automatiquement.
+Photo principale manquante : 10 (montre GPS).

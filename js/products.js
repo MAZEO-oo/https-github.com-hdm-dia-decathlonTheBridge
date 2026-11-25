@@ -400,6 +400,17 @@ const PRODUCTS = [
   }
 ];
 
+// Photos produits : place tes photos dans assets/products/ sous le nom product-<id>.jpg
+// (ex. product-1.jpg pour la KD900X.2). Si le fichier est absent, l'ancienne image en ligne sert de secours.
+PRODUCTS.forEach(p => {
+  p.imgFallback = p.img;
+  p.img = `assets/products/product-${p.id}.jpg`;
+  // Photos 2 et 3 (optionnelles) : product-<id>-2.jpg et product-<id>-3.jpg
+  p.gallery = [2, 3].map(n => `assets/products/product-${p.id}-${n}.jpg`);
+  // Produits sans photo adaptée pour l'instant : visuel neutre plutôt qu'une mauvaise photo
+  if ([4, 5, 16].includes(p.id)) p.imgFallback = 'assets/products/placeholder.svg';
+});
+
 // Helper pour retrouver un produit par son nom ou mot clé
 function findProductByQuery(query) {
   const q = (query || '').toLowerCase().trim();

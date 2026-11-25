@@ -31,14 +31,19 @@ class MaxChatbot {
   loadConfig() {
     try {
       const saved = localStorage.getItem('decathlon_max_config');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const cfg = JSON.parse(saved);
+        // Migration : les anciens modèles Gemini 1.5 sont arrêtés par Google
+        if (cfg.model && /gemini-1\.5/.test(cfg.model)) cfg.model = 'gemini-2.5-flash';
+        return cfg;
+      }
     } catch (e) {
       console.warn('Impossible de charger la config Max:', e);
     }
     return {
       provider: 'gemini', // 'gemini' | 'cloudflare' | 'openai'
       apiKey: '',
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       serverProxyUrl: '/api/chat'
     };
   }
@@ -207,7 +212,7 @@ class MaxChatbot {
 
     card.innerHTML = `
       <div class="chat-prod-thumb">
-        <img src="${prod.img}" alt="${prod.name}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80'">
+        <img src="${prod.img}" alt="${prod.name}" loading="lazy" onerror="this.onerror=null;this.src='${prod.imgFallback}'">
         <span class="chat-prod-badge">${prod.badge || prod.tag || 'Recommandé'}</span>
       </div>
       <div class="chat-prod-body">
@@ -445,7 +450,7 @@ Règles de balisage interactif indispensables :
     }));
 
     if (provider === 'gemini') {
-      const model = this.config.model || 'gemini-1.5-flash';
+      const model = this.config.model || 'gemini-2.5-flash';
       const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
       const contents = [];

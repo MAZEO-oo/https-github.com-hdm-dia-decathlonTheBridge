@@ -139,8 +139,9 @@ img {
 }
 
 .logo-icon {
-  width: 44px;
-  height: 36px;
+  height: 40px;
+  width: auto;
+  border-radius: 4px;
   object-fit: contain;
 }
 
@@ -759,7 +760,7 @@ img {
 
 .product-img-box {
   height: 220px;
-  background: var(--blue-soft);
+  background: #EEF0F2;
   position: relative;
   overflow: hidden;
   cursor: pointer;
@@ -768,7 +769,7 @@ img {
 .product-img-box img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.4s ease;
 }
 
@@ -975,14 +976,34 @@ img {
   height: 520px;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: var(--blue-soft);
+  background: #EEF0F2;
   box-shadow: var(--shadow-sm);
 }
 
 .detail-gallery img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+}
+
+.detail-thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.detail-thumbs img {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  background: #EEF0F2;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.detail-thumbs img.active {
+  border-color: var(--blue-primary);
 }
 
 .detail-info {

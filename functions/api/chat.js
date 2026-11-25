@@ -65,7 +65,7 @@ Règles de balisage interactif indispensables :
 
     // 1. Appel Google Gemini (Fournisseur prioritaire pour le projet)
     if (geminiKey) {
-      const model = env.GEMINI_MODEL || 'gemini-1.5-flash';
+      const model = env.GEMINI_MODEL || 'gemini-2.5-flash';
       const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
 
       const contents = [];
